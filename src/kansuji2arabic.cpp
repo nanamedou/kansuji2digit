@@ -26,8 +26,8 @@ const size_t zeros3_size = std::size(c_zeros3_kanji);
 // 1~9の漢数字をアラビア文字に変換
 std::tuple<str, size_t> kanji2arabic(bytes &data)
 {
-	str out_str;			// 戻り値の文字列
-	size_t out_size = 0; 	// 戻り値の文字列の文字列としての長さ
+	str out_str;		 // 戻り値の文字列
+	size_t out_size = 0; // 戻り値の文字列の文字列としての長さ
 
 	while (data[0])
 	{
@@ -50,7 +50,8 @@ std::tuple<str, size_t> kanji2arabic(bytes &data)
 		}
 
 		// 文字列が解決できなかったら終了
-		if (is_unknown)break;
+		if (is_unknown)
+			break;
 	}
 
 	return {out_str, out_size};
@@ -60,19 +61,19 @@ std::tuple<str, size_t> kanji2arabic(bytes &data)
 // 文字, 文字列の桁数
 std::tuple<str, size_t> kansuji9999_2arabic(bytes &data)
 {
-	str out_str;				// 戻り値の文字列
-	size_t out_size = 0;		// 戻り値の文字列の文字列としての長さ
+	str out_str;		 // 戻り値の文字列
+	size_t out_size = 0; // 戻り値の文字列の文字列としての長さ
 
-	size_t zeros = 0;			// 戻り値の文字列に追加する0の個数(out_str * (10^zeros) が実際の値になる)
-
+	size_t zeros = 0; // 戻り値の文字列に追加する0の個数(out_str * (10^zeros) が実際の値になる)
+	bool initial = true;
 
 	while (data[0])
 	{
 
 		// 戻り値の文字列
-		size_t add_zeros = 0;	// 戻り値の文字列
+		size_t add_zeros = 0; // 戻り値の文字列
 
-		auto [num_str, u8cc] = kanji2arabic(data);	// 戻り値の文字列
+		auto [num_str, u8cc] = kanji2arabic(data); // 戻り値の文字列
 
 		bool is_unknown = true; // 先頭の文字列が不明である
 
@@ -88,33 +89,47 @@ std::tuple<str, size_t> kansuji9999_2arabic(bytes &data)
 				data += c_size;
 				is_unknown = false;
 
-				if(0 == u8cc){
-					out_str += c_num_arabic_one;
-					out_size += 1;
+				// 頭に何も数字がないとき、例えば百とかのとき。1を追加する。
+				if (0 == u8cc)
+				{
+					num_str += c_num_arabic_one;
+					u8cc += 1;
 				}
 				break;
 			}
 		}
 
-		// out_strに0を追加。1*(10^4)に11*(10^0)のような値を追加するとき4-(2+0) = 2個0を追加する。
-		if (zeros > (add_zeros + u8cc))
-			for (size_t i = 0; i < (zeros - (add_zeros + u8cc)); i++){
-				out_str += c_num_arabic_zero;
-				out_size += 1;
+		if (not initial)
+		{
+			// 二百千のような変な数値のときエラー
+			if (zeros < (add_zeros + u8cc))
+			{
+				return {"NaN", -1};
 			}
-		out_str += num_str;// 数字を追加。
-		out_size += u8cc;// 文字数を追加。
+
+			// out_strに0を追加。1*(10^4)に11*(10^0)のような値を追加するとき4-(2+0) = 2個0を追加する。
+			if (zeros > (add_zeros + u8cc))
+				for (size_t i = 0; i < (zeros - (add_zeros + u8cc)); i++)
+				{
+					out_str += c_num_arabic_zero;
+					out_size += 1;
+				}
+		}
+		initial = false;
+
+		out_str += num_str; // 数字を追加。
+		out_size += u8cc;	// 文字数を追加。
 		zeros = add_zeros;	// 追加する0の個数は現在のものとなる
 
 		// 文字列が解決できなかったら終了
-		if (is_unknown)break;
+		if (is_unknown)
+			break;
 	}
 
-		// 末尾に追加の0を適用する
+	// 末尾に追加の0を適用する
 	for (size_t i = 0; i < zeros; i++)
-				out_str += c_num_arabic_zero;
+		out_str += c_num_arabic_zero;
 	out_size += zeros;
-
 
 	return {out_str, out_size};
 }
@@ -126,7 +141,7 @@ str kansuji2arabic(const str &s)
 	str out_str;
 	size_t zeros = 0;
 	size_t out_size = 0;
-
+	bool initial = true;
 
 	while (data[0])
 	{
@@ -134,8 +149,10 @@ str kansuji2arabic(const str &s)
 
 		auto [num_str, u8cc] = kansuji9999_2arabic(data);
 
-		bool is_unknown = true; // 先頭の文字列が不明である
+		if (-1 == u8cc)
+			return "NaN"; // 戻り値がエラーの時NaNを返す
 
+		bool is_unknown = true; // 先頭の文字列が不明である
 
 		for (size_t i = 0; i < zeros_size; i++)
 		{
@@ -146,30 +163,43 @@ str kansuji2arabic(const str &s)
 				data += c_size;
 				is_unknown = false;
 
-				if(0 == u8cc){
-					out_str += c_num_arabic_one;
-					out_size += 1;
+				// 頭に何も数字がないとき、例えば百とかのとき。1を追加する。
+				if (0 == u8cc)
+				{
+					num_str += c_num_arabic_one;
+					u8cc += 1;
 				}
 				break;
 			}
 		}
 
-		// 数字を追加する
-		if (zeros > (add_zeros + u8cc))
-			for (size_t i = 0; i < (zeros - (add_zeros + u8cc)); i++)
-				out_str += c_num_arabic_zero;
-				out_size += 1;
+		if (not initial)
+		{
+			// 二万一億のような変な数値のときエラー
+			if (zeros < (add_zeros + u8cc))
+			{
+				return "NaN";
+			}
+
+			// 数字を追加する
+			if (zeros > (add_zeros + u8cc))
+				for (size_t i = 0; i < (zeros - (add_zeros + u8cc)); i++)
+					out_str += c_num_arabic_zero;
+		}
+		initial = false;
+		out_size += 1;
 		out_str += num_str;
 		out_size += u8cc;
 		zeros = add_zeros;
 
 		// 文字列が解決できなかったら終了
-		if (is_unknown)break;
+		if (is_unknown)
+			break;
 	}
 
 	// 末尾に追加の0を適用する
 	for (size_t i = 0; i < zeros; i++)
-				out_str += c_num_arabic_zero;
+		out_str += c_num_arabic_zero;
 
 	return out_str;
 }
