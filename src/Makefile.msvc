@@ -1,0 +1,28 @@
+CC = cl.exe
+CXXC = cl.exe
+LINK=link.exe
+
+CFLAGS = /EHsc /std:c++17 /source-charset:utf-8 /execution-charset:utf-8 /O2
+LDFLAGS = /nologo /MACHINE:X64
+DEFS = 
+
+INC = -I. -I..
+DEL = del
+
+
+OBJ = kansuji2arabic.obj main.obj
+
+.c.obj:
+	$(CC) $(CFLAGS) $(INC) $(DEFS) -c  $<
+
+.cpp.obj:
+	$(CC) $(CFLAGS) $(INC) $(DEFS) -c  $<
+
+all: main
+
+main: $(OBJ) main.obj
+	$(LINK) $(LDFLAGS) /out:$@.exe main.obj kansuji2arabic.obj
+
+clean:
+	$(DEL) *.exe *.obj *.dll *.a *.lib *.o *.exp *.def *.pdb
+

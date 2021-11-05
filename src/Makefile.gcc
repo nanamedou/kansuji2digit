@@ -1,0 +1,28 @@
+CC = g++
+CXXC = g++
+LINK=link.exe
+
+CFLAGS = -std=c++17 -O2
+LDFLAGS = 
+DEFS = 
+
+INC = -I. -I..
+DEL = rm -f
+
+
+OBJ = kansuji2decimal.obj main.obj
+
+.c.obj:
+	$(CC) $(CFLAGS) $(INC) $(DEFS) -c  $<
+
+.cpp.obj:
+	$(CC) $(CFLAGS) $(INC) $(DEFS) -c  $<
+
+all: main
+
+main: $(OBJ) main.obj
+	$(LINK) $(LDFLAGS) /out:$@.exe main.obj kansuji2decimal.obj
+
+clean:
+	$(DEL) *.exe *.obj *.dll *.a *.lib *.o *.exp *.def *.pdb
+
