@@ -5,4 +5,11 @@
 using str = std::string;
 using bytes = const char*;
 
-str kansuji2digit(const str& s);
+class Kansuji2Digit{
+	str buffer;
+
+public:
+	char const* translate(char const* s);
+};
+
+

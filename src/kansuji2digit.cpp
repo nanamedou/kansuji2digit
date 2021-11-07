@@ -203,3 +203,9 @@ str kansuji2digit(const str &s)
 
 	return out_str;
 }
+
+
+char const* Kansuji2Digit::translate(char const* s){
+	this->buffer = kansuji2digit(s);
+	return this->buffer.c_str();
+}
