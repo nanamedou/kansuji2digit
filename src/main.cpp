@@ -4,14 +4,14 @@
 #include <locale>
 #include <iostream>
 
-#include "kansuji2arabic.h"
+#include "kansuji2digit.h"
 
 int main(int argc, char* argv[]){
 
 	str s;
 	while (std::cin.good()){
 		std::cin >> s;
-		std::cout << s << "=" << kansuji2arabic(s) << std::endl;
+		std::cout << s << "=" << kansuji2digit(s) << std::endl;
 	}
 	std::cout << "終わり" << std::endl;
 

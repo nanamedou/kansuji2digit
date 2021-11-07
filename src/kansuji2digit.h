@@ -5,4 +5,4 @@
 using str = std::string;
 using bytes = const char*;
 
-str kansuji2arabic(const str& s);
+str kansuji2digit(const str& s);

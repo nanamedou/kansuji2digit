@@ -7,13 +7,13 @@
 
 #include <iso646.h>
 
-#include "kansuji2arabic.h"
+#include "kansuji2digit.h"
 
-bytes c_num_arabic[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+bytes c_num_digit[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 bytes c_num_kanji[] = {"〇", "一", "二", "三", "四", "五", "六", "七", "八", "九"};
 const size_t num_size = std::size(c_num_kanji);
-bytes c_num_arabic_zero = c_num_arabic[0];
-bytes c_num_arabic_one = c_num_arabic[1];
+bytes c_num_digit_zero = c_num_digit[0];
+bytes c_num_digit_one = c_num_digit[1];
 
 const size_t u_zeros_log10[] = {4, 8, 12, 16, 20, 24, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68};
 bytes c_zeros_kanji[] = {"万", "億", "兆", "京", "垓", "𥝱", "秭", "穣", "溝", "澗", "正", "載", "極", "恒河沙", "阿僧祇", "那由他", "不可思議", "無量大数"};
@@ -24,7 +24,7 @@ bytes c_zeros3_kanji[] = {"十", "百", "千"};
 const size_t zeros3_size = std::size(c_zeros3_kanji);
 
 // 1~9の漢数字をアラビア文字に変換
-std::tuple<str, size_t> kanji2arabic(bytes &data)
+std::tuple<str, size_t> kanji2digit(bytes &data)
 {
 	str out_str;		 // 戻り値の文字列
 	size_t out_size = 0; // 戻り値の文字列の文字列としての長さ
@@ -41,7 +41,7 @@ std::tuple<str, size_t> kanji2arabic(bytes &data)
 			{
 				// 先頭の文字列が判明したとき
 				// 戻り値に文字を追加して、読み取りポインタを進める
-				out_str += c_num_arabic[i];
+				out_str += c_num_digit[i];
 				data += c_size;
 				out_size += 1;
 				is_unknown = false;
@@ -59,7 +59,7 @@ std::tuple<str, size_t> kanji2arabic(bytes &data)
 
 // 0~9999の漢数字をアラビア文字に変換
 // 文字, 文字列の桁数
-std::tuple<str, size_t> kansuji9999_2arabic(bytes &data)
+std::tuple<str, size_t> kansuji9999_2digit(bytes &data)
 {
 	str out_str;		 // 戻り値の文字列
 	size_t out_size = 0; // 戻り値の文字列の文字列としての長さ
@@ -73,7 +73,7 @@ std::tuple<str, size_t> kansuji9999_2arabic(bytes &data)
 		// 戻り値の文字列
 		size_t add_zeros = 0; // 戻り値の文字列
 
-		auto [num_str, u8cc] = kanji2arabic(data); // 戻り値の文字列
+		auto [num_str, u8cc] = kanji2digit(data); // 戻り値の文字列
 
 		bool is_unknown = true; // 先頭の文字列が不明である
 
@@ -92,7 +92,7 @@ std::tuple<str, size_t> kansuji9999_2arabic(bytes &data)
 				// 頭に何も数字がないとき、例えば百とかのとき。1を追加する。
 				if (0 == u8cc)
 				{
-					num_str += c_num_arabic_one;
+					num_str += c_num_digit_one;
 					u8cc += 1;
 				}
 				break;
@@ -111,7 +111,7 @@ std::tuple<str, size_t> kansuji9999_2arabic(bytes &data)
 			if (zeros > (add_zeros + u8cc))
 				for (size_t i = 0; i < (zeros - (add_zeros + u8cc)); i++)
 				{
-					out_str += c_num_arabic_zero;
+					out_str += c_num_digit_zero;
 					out_size += 1;
 				}
 		}
@@ -128,13 +128,13 @@ std::tuple<str, size_t> kansuji9999_2arabic(bytes &data)
 
 	// 末尾に追加の0を適用する
 	for (size_t i = 0; i < zeros; i++)
-		out_str += c_num_arabic_zero;
+		out_str += c_num_digit_zero;
 	out_size += zeros;
 
 	return {out_str, out_size};
 }
 
-str kansuji2arabic(const str &s)
+str kansuji2digit(const str &s)
 {
 	bytes data = s.c_str();
 
@@ -147,7 +147,7 @@ str kansuji2arabic(const str &s)
 	{
 		size_t add_zeros = 0;
 
-		auto [num_str, u8cc] = kansuji9999_2arabic(data);
+		auto [num_str, u8cc] = kansuji9999_2digit(data);
 
 		if (-1 == u8cc)
 			return "NaN"; // 戻り値がエラーの時NaNを返す
@@ -166,7 +166,7 @@ str kansuji2arabic(const str &s)
 				// 頭に何も数字がないとき、例えば百とかのとき。1を追加する。
 				if (0 == u8cc)
 				{
-					num_str += c_num_arabic_one;
+					num_str += c_num_digit_one;
 					u8cc += 1;
 				}
 				break;
@@ -184,7 +184,7 @@ str kansuji2arabic(const str &s)
 			// 数字を追加する
 			if (zeros > (add_zeros + u8cc))
 				for (size_t i = 0; i < (zeros - (add_zeros + u8cc)); i++)
-					out_str += c_num_arabic_zero;
+					out_str += c_num_digit_zero;
 		}
 		initial = false;
 		out_size += 1;
@@ -199,7 +199,7 @@ str kansuji2arabic(const str &s)
 
 	// 末尾に追加の0を適用する
 	for (size_t i = 0; i < zeros; i++)
-		out_str += c_num_arabic_zero;
+		out_str += c_num_digit_zero;
 
 	return out_str;
 }

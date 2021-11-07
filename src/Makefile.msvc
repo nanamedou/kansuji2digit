@@ -10,7 +10,7 @@ INC = -I. -I..
 DEL = del
 
 
-OBJ = kansuji2arabic.obj main.obj
+OBJ = kansuji2digit.obj main.obj
 
 .c.obj:
 	$(CC) $(CFLAGS) $(INC) $(DEFS) -c  $<
@@ -21,7 +21,7 @@ OBJ = kansuji2arabic.obj main.obj
 all: main
 
 main: $(OBJ) main.obj
-	$(LINK) $(LDFLAGS) /out:$@.exe main.obj kansuji2arabic.obj
+	$(LINK) $(LDFLAGS) /out:$@.exe main.obj kansuji2digit.obj
 
 clean:
 	$(DEL) *.exe *.obj *.dll *.a *.lib *.o *.exp *.def *.pdb
