@@ -11,7 +11,8 @@ int main(int argc, char* argv[]){
 	str s;
 	while (std::cin.good()){
 		std::cin >> s;
-		std::cout << s << "=" << kansuji2digit(s) << std::endl;
+		k2d::Converter c;
+		std::cout << s << "=" << c.kansuji2digit(s.c_str()) << std::endl;
 	}
 	std::cout << "終わり" << std::endl;
 

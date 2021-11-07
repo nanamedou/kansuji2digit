@@ -3,3 +3,7 @@
 *.exe
 *.lib
 *.bin
+*.pyd
+*.exp
+*.pyc
+*.dll

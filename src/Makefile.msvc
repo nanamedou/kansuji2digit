@@ -3,14 +3,15 @@ CXXC = cl.exe
 LINK=link.exe
 
 CFLAGS = /EHsc /std:c++17 /source-charset:utf-8 /execution-charset:utf-8 /O2
-LDFLAGS = /nologo /MACHINE:X64
+LDFLAGS = /nologo /MACHINE:X64 /LIBPATH:"C:\Program Files\Python\Python39\libs"
+DEL = del
 DEFS = 
 
-INC = -I. -I..
+INC = -I. -I.. /I"C:\Program Files\Python\Python39\include"
 DEL = del
 
 
-OBJ = kansuji2digit.obj main.obj
+OBJ = kansuji2digit.obj main.obj kansuji2digit_wrap.obj
 
 .c.obj:
 	$(CC) $(CFLAGS) $(INC) $(DEFS) -c  $<
@@ -18,10 +19,13 @@ OBJ = kansuji2digit.obj main.obj
 .cpp.obj:
 	$(CC) $(CFLAGS) $(INC) $(DEFS) -c  $<
 
-all: main
+all: main kansuji2digit
 
 main: $(OBJ) main.obj
 	$(LINK) $(LDFLAGS) /out:$@.exe main.obj kansuji2digit.obj
+
+kansuji2digit: $(OBJ) main.obj
+	$(LINK) $(LDFLAGS) /DLL /out:_$@.pyd kansuji2digit.obj kansuji2digit_wrap.obj
 
 clean:
 	$(DEL) *.exe *.obj *.dll *.a *.lib *.o *.exp *.def *.pdb
