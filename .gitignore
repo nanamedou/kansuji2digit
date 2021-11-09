@@ -7,3 +7,6 @@
 *.exp
 *.pyc
 *.dll
+
+python/dist/
+python/src/kansuji2digit.egg-info
